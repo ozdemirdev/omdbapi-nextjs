@@ -1,0 +1,70 @@
+.pageWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 95vh;
+  
+  .cardsWrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 20px 20px;
+    grid-template-areas:
+      ". . . . ."
+      ". . . . .";
+
+  }
+
+  .filterWrapper {
+    form {
+      display: flex;
+      flex-direction: row;
+      gap: 30px;
+      align-items: center;
+      height: 50px;
+
+      input {
+        border: none;
+        outline: none;
+      }
+
+      div {
+        padding: 5px;
+        border-right: 2px solid gray;
+        border-bottom: 2px solid gray;
+        border-radius: 12px;
+      }
+
+      button {
+        border: none;
+        outline: none;
+        border-left: 2px solid gray;
+        border-top: 2px solid gray;
+        background-color: transparent;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 12px;
+      }
+    }
+  }
+
+  .pagerWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+
+    div:first-child,
+    div:last-child {
+      border-left: 2px solid gray;
+      border-top: 2px solid gray;
+      padding: 5px;
+      cursor: pointer;
+      border-radius: 12px;
+    }
+  }
+}

@@ -1,131 +1,108 @@
-import Head from 'next/head';
-import styles from '../styles/Home.module.css';
+import styles from '../styles/Home.module.scss';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchData } from '../redux/actions';
+import { useEffect, useState } from 'react';
+import FilmList from '../components/filmList';
 
-export default function Home() {
+export default function Home({ Component, pageProps }) {
+  const dispatch = useDispatch();
+  const filmData = useSelector(state => state.data.data);
+  const loading = useSelector(state => state.data.loading);
+  const error = useSelector(state => state.data.error);
+
+  const [searchText, setsearchText] = useState("Pokemon")
+  const [year, setYear] = useState()
+  const [type, setType] = useState("")
+  const [activePage, setActivePage] = useState(1)
+
+  useEffect(() => {
+
+    dispatch(fetchData(searchText, year, activePage, type))
+  }, [dispatch, activePage]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <div className={styles.pageWrapper}>
+      <div className={styles.filterWrapper}>
+        <form onSubmit={onSubmit}>
+          <div>
+            <label>Search: </label>
+            <input type="text" required value={searchText} onChange={handleSearchChange} name="searchText" />
+          </div>
+          <div>
+            <label>Year: </label>
+            <input value={year} onChange={handleYearChange} type="number" name="year" min={1900} max={(new Date()).getFullYear()} />
+          </div>
+          <div>
+            <label>Type: </label>
+            <select name='type' value={type} onChange={(choice) => handleTypeSelection(choice)} id='type'>
+              <option value="">All</option>
+              <option value="movie">Movie</option>
+              <option value="series">Series</option>
+              <option value="episode">Episodes</option>
+            </select>
+          </div>
 
-      <main>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
 
-        <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
-        </p>
+          <button type="submit">Search</button>
+        </form>
+      </div>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+        <FilmList filmData={{filmData: filmData}}></FilmList>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel" className={styles.logo} />
-        </a>
-      </footer>
-
-      <style jsx>{`
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        footer img {
-          margin-left: 0.5rem;
-        }
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          text-decoration: none;
-          color: inherit;
-        }
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family:
-            Menlo,
-            Monaco,
-            Lucida Console,
-            Liberation Mono,
-            DejaVu Sans Mono,
-            Bitstream Vera Sans Mono,
-            Courier New,
-            monospace;
-        }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family:
-            -apple-system,
-            BlinkMacSystemFont,
-            Segoe UI,
-            Roboto,
-            Oxygen,
-            Ubuntu,
-            Cantarell,
-            Fira Sans,
-            Droid Sans,
-            Helvetica Neue,
-            sans-serif;
-        }
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
+      <div className={styles.pagerWrapper}>
+        <div onClick={() => handlePageChange(false)}>Prev</div>
+        <div>{activePage}</div>
+        <div onClick={() => handlePageChange(true)}>Next</div>
+      </div>
     </div>
+
   );
+
+  async function onSubmit(event) {
+    event.preventDefault();
+    setsearchText(searchText)
+    setYear(year),
+    setActivePage(1),
+    setType(type)
+    dispatch(fetchData(searchText, year, activePage, type))
+  }
+
+  function handleSearchChange(e) {
+    setsearchText(e.target.value)
+  }
+
+  function handleYearChange(e){
+    setYear(e.target.value)
+  }
+
+  function handleTypeSelection(event){
+    setType(event.target.value)
+  }
+
+  function handlePageChange(isNext){
+    let maxPages = 0;
+    if(filmData.totalResults % 10 > 0) {
+      maxPages = (filmData.totalResults / 10) + 1;
+    }
+    else{
+      maxPages = filmData.totalResults / 10;
+    }
+    
+    if(isNext && maxPages !== activePage){
+      setActivePage(activePage + 1)
+    }
+    else{
+      if(activePage > 1){
+        setActivePage(activePage - 1)
+      }
+    }
+  }
 }

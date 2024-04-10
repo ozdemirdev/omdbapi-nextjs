@@ -6,9 +6,12 @@
     "start": "next start"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.2.3",
     "next": "latest",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-redux": "^9.1.0",
+    "sass": "^1.74.1"
   },
   "engines": {
     "node": ">=18"
